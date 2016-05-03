@@ -320,11 +320,11 @@ int main(int argc, char **argv) {
 		 
 		 float deltaR_jetallpartons[2];
 		 float mindeltaR_jetallpartons[2];
-		 float genindex[2];
+		 int genindex[2];
 		 for(int n=0; n<2; n++){
 		   deltaR_jetallpartons[n]= -999;
 		   mindeltaR_jetallpartons[n]= 999;
-		   genindex[n]=-1;
+		   genindex[n]=999;
 		   for(int i=0; i<genPartSize; i++){	   
 		     if(genpartpt[i]>0.1){
 		       if(genpartstatus[i]==23){
@@ -345,13 +345,14 @@ int main(int argc, char **argv) {
 		     if(abs((SelectedJets[0].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[0].vect).Eta())<etaRatiobins[j+1] && ((SelectedJets[1].vect).Pt())>ptRatiobins[i] &&  ((SelectedJets[1].vect).Pt())<ptRatiobins[i+1]){
 		       
 		       if(mindeltaR_jetallpartons[0]<0.3){                                                            		 
-			 if(fabs(genindex[0])<=5){
+			 //if(fabs(genindex[0])<=5){
+			 if((genindex[0]<=5 && genindex[0]>=-5)){
 			   h_ptD_quark[i][j]->Fill(SelectedJets[0].ptD);
 			   h_nPart_quark[i][j]->Fill(SelectedJets[0].nPart);
 			   h_minW_quark[i][j]->Fill(-log(SelectedJets[0].minW));                                   
 			   h_qgl_quark[i][j]->Fill(SelectedJets[0].qgl);     
 			 }
-			 else if(fabs(genindex[0])==21){
+			 else if(genindex[0]==21){
 			   h_ptD_gluon[i][j]->Fill(SelectedJets[0].ptD);
 			   h_nPart_gluon[i][j]->Fill(SelectedJets[0].nPart);
 			   h_minW_gluon[i][j]->Fill(-log(SelectedJets[0].minW));
@@ -375,13 +376,14 @@ int main(int argc, char **argv) {
 		     if(abs((SelectedJets[1].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[1].vect).Eta())<etaRatiobins[j+1] && ((SelectedJets[0].vect).Pt())>ptRatiobins[i] &&  ((SelectedJets[0].vect).Pt())<ptRatiobins[i+1]){                                             
 		       
 		       if(mindeltaR_jetallpartons[1]<0.3){                                                            
-			 if(fabs(genindex[1])<=5){ 
+			 //if(fabs(genindex[1])<=5){ 
+			 if((genindex[1]<=5 && genindex[1]>=-5)){
 			   h_ptD_quark[i][j]->Fill(SelectedJets[1].ptD);
 			   h_nPart_quark[i][j]->Fill(SelectedJets[1].nPart);
 			   h_minW_quark[i][j]->Fill(-log(SelectedJets[1].minW));                                     
 			   h_qgl_quark[i][j]->Fill(SelectedJets[1].qgl);     
 			 }
-			 else if(fabs(genindex[1])==21){
+			 else if(genindex[1]==21){
 			   h_ptD_gluon[i][j]->Fill(SelectedJets[1].ptD);
 			   h_nPart_gluon[i][j]->Fill(SelectedJets[1].nPart);
 			   h_minW_gluon[i][j]->Fill(-log(SelectedJets[1].minW));

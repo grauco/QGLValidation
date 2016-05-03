@@ -41,7 +41,7 @@ parser.add_option('-d', '--isData', dest='isData', type='string', default = 'MC'
 parser.add_option('-g','--gdb', dest='gdb', action='store_true', default=False)
 parser.add_option('-n','--dryrun', dest='dryrun', action='store_true', default=False)
 parser.add_option('-m','--mode', dest='mode', default='t3se', choices=['local','t3se'])
-parser.add_option('--t3batch', dest='t3batch', action='store_true', default=False)
+parser.add_option('--t3batch', dest='t3batch', action='store_true', default=True)
 
 isData="MC"
 (opt, args) = parser.parse_args()
@@ -91,8 +91,8 @@ for s in samples:
         if exists(d): continue
         os.makedirs(d)
 
-    cmd = 'ttDManalysis '+ s + ' ' + sampleFileList  + ' ' + opt.channel + ' ' + opt.cat + ' ' + opt.sys + ' ' + opt.sync + ' ' + isData
-#    cmd = "ttDManalysis "+ s + " " + path + s  + " " + opt.channel + " " +opt.cat + " " + opt.sys + " " + opt.sync + " " + isData
+    cmd = 'Validation '+ s + ' ' + sampleFileList  + ' ' + opt.channel + ' ' + opt.cat + ' ' + opt.sys + ' ' + opt.sync + ' ' + isData
+#    cmd = "Validation "+ s + " " + path + s  + " " + opt.channel + " " +opt.cat + " " + opt.sys + " " + opt.sync + " " + isData
 
     if opt.gdb:
         cmd = 'gdb --args '+cmd
