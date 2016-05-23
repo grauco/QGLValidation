@@ -93,11 +93,12 @@ int main(int argc, char **argv) {
 
   Int_t nEvents = (Int_t)chain.GetEntries();
   std::cout<<"Number of Events: "<<nEvents<< endl;
-  nEvents=10000;
+  nEvents=1000000;
                                                                                   
   int sizeMax=50;
   Int_t jetSize, genPartSize, muonSize;
   float passTrig300(0.), passTrig600(0.), passTrig800(0.), passTrigBias(0.);
+  int nPV, nGoodPV, nTruePV;
 
   float rho(0.),w(1.), runNumber(0.), lumiSec(0.), Ht(0.);
   double evtNumber(0.);
@@ -151,13 +152,13 @@ int main(int argc, char **argv) {
    chain.SetBranchAddress("jetsAK4Tight_pileupJetIdnNeutrals",pileupJetIdnNeutrals);
    chain.SetBranchAddress("jetsAK4Tight_pileupJetIdpull", pileupJetIdpull);
 
-   chain.SetBranchAddress("muons_E", muone);
-   chain.SetBranchAddress("muons_Pt", muonpt);
-   chain.SetBranchAddress("muons_Phi", muonphi);
-   chain.SetBranchAddress("muons_Eta", muoneta);
-   chain.SetBranchAddress("muons_Charge", muoncharge);
-   chain.SetBranchAddress("muons_size", &muonSize);
-   chain.SetBranchAddress("muons_IsTightMuon", &muonIsTight);
+   chain.SetBranchAddress("muonsMedium_E", muone);
+   chain.SetBranchAddress("muonsMedium_Pt", muonpt);
+   chain.SetBranchAddress("muonsMedium_Phi", muonphi);
+   chain.SetBranchAddress("muonsMedium_Eta", muoneta);
+   chain.SetBranchAddress("muonsMedium_Charge", muoncharge);
+   chain.SetBranchAddress("muonsMedium_size", &muonSize);
+   chain.SetBranchAddress("muonsMedium_IsTightMuon", &muonIsTight);
    
    chain.SetBranchAddress("Event_passesHLT_PFHT600_v3", &passTrig600);
    chain.SetBranchAddress("Event_passesHLT_PFHT300_v2", &passTrig300);
@@ -166,10 +167,17 @@ int main(int argc, char **argv) {
    chain.SetBranchAddress("Event_Ht", &Ht);
    
    chain.SetBranchAddress("Event_Rho", &rho);
+   chain.SetBranchAddress("Event_nPV", &nPV);
+   chain.SetBranchAddress("Event_nGoodPV", &nGoodPV);
+   chain.SetBranchAddress("Event_nTrue", &nTruePV);
    chain.SetBranchAddress("Event_RunNumber", &runNumber);
    chain.SetBranchAddress("Event_LumiBlock", &lumiSec);
    chain.SetBranchAddress("Event_EventNumber", &evtNumber);
 
+   TH1F *h_nPV = new TH1F("h_nPV","nPV", 30, 0,30);
+   TH1F *h_nTruePV = new TH1F("h_nTruePV","nTruePV", 30, 0,30);
+   TH1F *h_nGoodPV = new TH1F("h_nGoodPV","nGoodPV", 30, 0,30);
+   
    int a,b;
    int N = 10, M=5;
 
@@ -189,12 +197,39 @@ int main(int argc, char **argv) {
    TH1F *h_qgl_quark[N][M];
    TH1F *h_qgl_gluon[N][M];
    TH1F *h_qgl_undef[N][M];
-  
+   TH1F *h_chg[N][M];
+   TH1F *h_chg_quark[N][M];
+   TH1F *h_chg_gluon[N][M];
+   TH1F *h_chg_undef[N][M];
+   TH1F *h_neu[N][M];
+   TH1F *h_neu_quark[N][M];
+   TH1F *h_neu_gluon[N][M];
+   TH1F *h_neu_undef[N][M];
+
+   TH1F *h_pt[M];
+   TH1F *h_pt_quark[M];
+   TH1F *h_pt_gluon[M];
+   TH1F *h_pt_undef[M];
+   
+   char pt[100], pt_quark[100], pt_gluon[100], pt_undef[100];
+   char chg[100], chg_quark[100], chg_gluon[100], chg_undef[100];
+   char neu[100], neu_quark[100], neu_gluon[100], neu_undef[100];
    char qgl[100], qgl_quark[100], qgl_gluon[100], qgl_undef[100];
    char ptD[100], minW[100], nPart[100];
    char ptD_quark[100], minW_quark[100], nPart_quark[100];
    char ptD_gluon[100], minW_gluon[100], nPart_gluon[100];
-   char ptD_undef[100], minW_undef[100], nPart_undef[100];  
+   char ptD_undef[100], minW_undef[100], nPart_undef[100];
+
+   for(b=0; b<M; b++){
+       sprintf(pt, "h_pt_%d",b);
+       h_pt[b] = new TH1F(pt, pt, 400, 0, 800);
+       sprintf(pt_gluon, "h_pt_gluon_%d", b);
+       h_pt_gluon[b] = new TH1F(pt_gluon, pt_gluon,400, 0, 800);
+       sprintf(pt_quark, "h_pt_quark_%d",b);
+       h_pt_quark[b] = new TH1F(pt_quark, pt_quark,400, 0, 800);
+       sprintf(pt_undef, "h_pt_undef_%d",b);
+       h_pt_undef[b] = new TH1F(pt_undef, pt_undef,400, 0, 800);
+   }
    for(a=0; a<N; a++){
      for(b=0; b<M; b++){
        
@@ -206,6 +241,25 @@ int main(int argc, char **argv) {
        h_qgl_quark[a][b] = new TH1F(qgl_quark, qgl_quark,25, 0, 1);
        sprintf(qgl_undef, "h_qgl_undef_%d_%d", a,b);
        h_qgl_undef[a][b] = new TH1F(qgl_undef, qgl_undef,25, 0, 1);
+
+        sprintf(chg, "h_chg_%d_%d", a,b);
+       h_chg[a][b] = new TH1F(chg, chg, 40 , 0-.5,40-.5);
+       sprintf(chg_gluon, "h_chg_gluon_%d_%d", a,b);
+       h_chg_gluon[a][b] = new TH1F(chg_gluon, chg_gluon,40 , 0-.5,40-.5);
+       sprintf(chg_quark, "h_chg_quark_%d_%d", a,b);
+       h_chg_quark[a][b] = new TH1F(chg_quark, chg_quark,40 , 0-.5,40-.5);
+       sprintf(chg_undef, "h_chg_undef_%d_%d", a,b);
+       h_chg_undef[a][b] = new TH1F(chg_undef, chg_undef,40 , 0-.5,40-.5);
+
+       sprintf(neu, "h_neu_%d_%d", a,b);
+       h_neu[a][b] = new TH1F(neu, neu, 40 , 0-.5,40-.5);
+       sprintf(neu_gluon, "h_neu_gluon_%d_%d", a,b);
+       h_neu_gluon[a][b] = new TH1F(neu_gluon, neu_gluon,40 , 0-.5,40-.5);
+       sprintf(neu_quark, "h_neu_quark_%d_%d", a,b);
+       h_neu_quark[a][b] = new TH1F(neu_quark, neu_quark,40 , 0-.5,40-.5);
+       sprintf(neu_undef, "h_neu_undef_%d_%d", a,b);
+       h_neu_undef[a][b] = new TH1F(neu_undef, neu_undef,40 , 0-.5,40-.5);
+
 
        sprintf(ptD, "h_ptD_%d_%d", a,b);
        h_ptD[a][b] = new TH1F(ptD, ptD,50,0,1);
@@ -243,7 +297,9 @@ int main(int argc, char **argv) {
    
    for(Int_t i=0; i<nEvents; i++ )
      {
-       
+  
+       //cout << genPartSize << endl;
+     
        if(i%100000==1 ){
 	 cout<<"Running on event: "<<i<<endl;
        }
@@ -259,12 +315,15 @@ int main(int argc, char **argv) {
 	 float ptD;
 	 int nPart;
 	 float minW;
+	 float chg;
+	 float neu;
+	 float pt;
        };
        std::vector<TightJets> SelectedJets;
     
        if((passTrigBias)>0.){	
 	 n_trig+= w;
-	 if(jetSize>1 && jetpt[0]>40 && jetpt[1]>20){
+	 if(jetSize>1 && jetpt[0]>30 && jetpt[1]>20){
 	   TLorentzVector jet0;
 	   jet0.SetPtEtaPhiE(jetpt[0], jeteta[0], jetphi[0], jete[0]);
 	   TLorentzVector jet1;
@@ -283,6 +342,9 @@ int main(int argc, char **argv) {
 	     b.minW=jetaxis2[0];
 	     b.ptD=jetptd[0];
 	     b.nPart = jetmult[0];
+	     b.chg = pileupJetIdnCharged[0] ;
+	     b.neu = pileupJetIdnNeutrals[1];
+	     b.pt = jet0.Pt();
 	     SelectedJets.push_back(b);
 
 	     TightJets b2;
@@ -292,6 +354,9 @@ int main(int argc, char **argv) {
 	     b2.minW=jetaxis2[1];
 	     b2.ptD=jetptd[1];
 	     b2.nPart = jetmult[1];
+	     b2.chg = pileupJetIdnCharged[1];
+	     b2.neu = pileupJetIdnNeutrals[1];
+	     b2.pt = jet1.Pt();
 	     SelectedJets.push_back(b2);
 	   }
 	     
@@ -300,13 +365,29 @@ int main(int argc, char **argv) {
 	     if(areBackToBack){
 	       n_isBackToBack+=w;
 	       if(SelectedJets.size()>1){
+
+
+		 h_nPV->Fill(nPV);
+		 h_nGoodPV->Fill(nGoodPV);
+		 h_nTruePV->Fill(nTruePV);
+
+		 for(int j=0;j<4;j++){
+		   if(abs((SelectedJets[0].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[0].vect).Eta())<etaRatiobins[j+1]){
+		       h_pt[j]->Fill(SelectedJets[0].pt);
+		   }
+		   if(abs((SelectedJets[1].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[1].vect).Eta())<etaRatiobins[j+1]){
+		     h_pt[j]->Fill(SelectedJets[1].pt);
+                   }
+		 }
 		 for(int i=0;i<9;i++){
-		   for(int j=0;j<5;j++){	       
+		   for(int j=0;j<4;j++){	       
 		     if(abs((SelectedJets[0].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[0].vect).Eta())<etaRatiobins[j+1] && ((SelectedJets[1].vect).Pt())>ptRatiobins[i] &&  ((SelectedJets[1].vect).Pt())<ptRatiobins[i+1]){	 
 		       h_ptD[i][j]->Fill(SelectedJets[0].ptD);
 		       h_nPart[i][j]->Fill(SelectedJets[0].nPart);
 		       h_minW[i][j]->Fill(-log(SelectedJets[0].minW));
-		       h_qgl[i][j]->Fill(SelectedJets[0].qgl);			  
+		       h_qgl[i][j]->Fill(SelectedJets[0].qgl);
+		       h_chg[i][j]->Fill(SelectedJets[0].chg);
+		       h_neu[i][j]->Fill(SelectedJets[0].neu);
 			 
 		     }
 		     if(abs((SelectedJets[1].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[1].vect).Eta())<etaRatiobins[j+1] && ((SelectedJets[0].vect).Pt())>ptRatiobins[i] &&  ((SelectedJets[0].vect).Pt())<ptRatiobins[i+1]){
@@ -314,6 +395,8 @@ int main(int argc, char **argv) {
 		       h_nPart[i][j]->Fill(SelectedJets[1].nPart);
 		       h_minW[i][j]->Fill(-log(SelectedJets[1].minW));
 		       h_qgl[i][j]->Fill(SelectedJets[1].qgl);
+		       h_chg[i][j]->Fill(SelectedJets[1].chg);
+		       h_neu[i][j]->Fill(SelectedJets[1].neu);
 		     }
 		   } 
 		 }
@@ -327,8 +410,9 @@ int main(int argc, char **argv) {
 		   genindex[n]=999;
 		   for(int i=0; i<genPartSize; i++){	   
 		     if(genpartpt[i]>0.1){
-		       if(genpartstatus[i]==23){
-			 TLorentzVector genParticle;
+		       //if(genpartstatus[i]==11){
+		       if(genpartstatus[i]<=23.1 && genpartstatus[i]>=22.9){
+		       TLorentzVector genParticle;
 			 genParticle.SetPtEtaPhiE(genpartpt[i], genparteta[i], genpartphi[i], genparte[i]);
 			 deltaR_jetallpartons[n]=deltaR((SelectedJets[n].vect).Eta(),(SelectedJets[n].vect).Phi(),genparteta[i],genpartphi[i]);
 			 if(deltaR_jetallpartons[n] < mindeltaR_jetallpartons[n]){                 
@@ -339,7 +423,37 @@ int main(int argc, char **argv) {
 		     }
 		   }
 		 }
-		 
+
+
+		 for(int j=0;j<4;j++){
+		   if(abs((SelectedJets[0].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[0].vect).Eta())<etaRatiobins[j+1]){
+		     if(mindeltaR_jetallpartons[0]<0.3){
+		       if((genindex[0]<=5 && genindex[0]>=-5)){
+			 h_pt_quark[j]->Fill(SelectedJets[0].pt);
+		       }
+		       else if(genindex[0]<=21.1 && genindex[0]>=20.9){
+			 h_pt_gluon[j]->Fill(SelectedJets[0].pt);
+		       }
+		     }
+		     else{
+		       h_pt_undef[j]->Fill(SelectedJets[0].pt);
+		     }
+		   }
+		   if(abs((SelectedJets[1].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[1].vect).Eta())<etaRatiobins[j+1]){
+		     if(mindeltaR_jetallpartons[1]<0.3){
+		       if((genindex[1]<=5 && genindex[0]>=-5)){
+			 h_pt_quark[j]->Fill(SelectedJets[1].pt);
+		       }
+		       else if(genindex[1]<=21.1 && genindex[1]>=20.9){
+			 h_pt_gluon[j]->Fill(SelectedJets[1].pt);
+		       }
+		     }
+		     else{
+		       h_pt_undef[j]->Fill(SelectedJets[1].pt);
+		     }
+		   }
+		   
+		 }
 		 for(int i=0;i<9;i++){
 		   for(int j=0;j<5;j++){
 		     if(abs((SelectedJets[0].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[0].vect).Eta())<etaRatiobins[j+1] && ((SelectedJets[1].vect).Pt())>ptRatiobins[i] &&  ((SelectedJets[1].vect).Pt())<ptRatiobins[i+1]){
@@ -350,26 +464,27 @@ int main(int argc, char **argv) {
 			   h_ptD_quark[i][j]->Fill(SelectedJets[0].ptD);
 			   h_nPart_quark[i][j]->Fill(SelectedJets[0].nPart);
 			   h_minW_quark[i][j]->Fill(-log(SelectedJets[0].minW));                                   
-			   h_qgl_quark[i][j]->Fill(SelectedJets[0].qgl);     
+			   h_qgl_quark[i][j]->Fill(SelectedJets[0].qgl);
+			   h_chg_quark[i][j]->Fill(SelectedJets[0].chg);
+			   h_neu_quark[i][j]->Fill(SelectedJets[0].neu); 
 			 }
-			 else if(genindex[0]==21){
+			 else if(genindex[0]<=21.1 && genindex[0]>=20.9){
 			   h_ptD_gluon[i][j]->Fill(SelectedJets[0].ptD);
 			   h_nPart_gluon[i][j]->Fill(SelectedJets[0].nPart);
 			   h_minW_gluon[i][j]->Fill(-log(SelectedJets[0].minW));
 			   h_qgl_gluon[i][j]->Fill(SelectedJets[0].qgl);
+			   h_chg_gluon[i][j]->Fill(SelectedJets[0].chg);
+			   h_neu_gluon[i][j]->Fill(SelectedJets[0].neu); 
 			 }
-			 else{                                                                           
-			   h_ptD_undef[i][j]->Fill(SelectedJets[0].ptD);
-			   h_nPart_undef[i][j]->Fill(SelectedJets[0].nPart);
-			   h_minW_undef[i][j]->Fill(-log(SelectedJets[0].minW));
-			   h_qgl_undef[i][j]->Fill(SelectedJets[0].qgl);                              
-			 }
+			
 		       }
 		       else{
 			 h_ptD_undef[i][j]->Fill(SelectedJets[0].ptD);
 			 h_nPart_undef[i][j]->Fill(SelectedJets[0].nPart);
 			 h_minW_undef[i][j]->Fill(-log(SelectedJets[0].minW));
 			 h_qgl_undef[i][j]->Fill(SelectedJets[0].qgl);
+			 h_chg_undef[i][j]->Fill(SelectedJets[0].chg);
+			 h_neu_undef[i][j]->Fill(SelectedJets[0].neu); 
 		       }
 		     }
 		     
@@ -381,26 +496,27 @@ int main(int argc, char **argv) {
 			   h_ptD_quark[i][j]->Fill(SelectedJets[1].ptD);
 			   h_nPart_quark[i][j]->Fill(SelectedJets[1].nPart);
 			   h_minW_quark[i][j]->Fill(-log(SelectedJets[1].minW));                                     
-			   h_qgl_quark[i][j]->Fill(SelectedJets[1].qgl);     
+			   h_qgl_quark[i][j]->Fill(SelectedJets[1].qgl);
+			   h_chg_quark[i][j]->Fill(SelectedJets[1].chg);
+			   h_neu_quark[i][j]->Fill(SelectedJets[1].neu);
 			 }
-			 else if(genindex[1]==21){
+			 else if(genindex[1]<=21.1 && genindex[1]>=20.9){
 			   h_ptD_gluon[i][j]->Fill(SelectedJets[1].ptD);
 			   h_nPart_gluon[i][j]->Fill(SelectedJets[1].nPart);
 			   h_minW_gluon[i][j]->Fill(-log(SelectedJets[1].minW));
-			   h_qgl_gluon[i][j]->Fill(SelectedJets[1].qgl);		   
+			   h_qgl_gluon[i][j]->Fill(SelectedJets[1].qgl);
+			   h_chg_gluon[i][j]->Fill(SelectedJets[1].chg);
+			   h_neu_gluon[i][j]->Fill(SelectedJets[1].neu);
 			 }
-			 else{                                                                        
-			   h_ptD_undef[i][j]->Fill(SelectedJets[1].ptD);
-			   h_nPart_undef[i][j]->Fill(SelectedJets[1].nPart);
-			   h_minW_undef[i][j]->Fill(-log(SelectedJets[1].minW));
-			   h_qgl_undef[i][j]->Fill(SelectedJets[1].qgl);
-			 }
+		
 		       }
 		       else{
 			 h_ptD_undef[i][j]->Fill(SelectedJets[1].ptD);
 			 h_nPart_undef[i][j]->Fill(SelectedJets[1].nPart);
 			 h_minW_undef[i][j]->Fill(-log(SelectedJets[1].minW));
-			 h_qgl_undef[i][j]->Fill(SelectedJets[1].qgl);		 
+			 h_qgl_undef[i][j]->Fill(SelectedJets[1].qgl);
+			 h_chg_undef[i][j]->Fill(SelectedJets[1].chg);
+			 h_neu_undef[i][j]->Fill(SelectedJets[1].neu); 
 		       }
 		     }			
 		   }
@@ -412,9 +528,20 @@ int main(int argc, char **argv) {
        }
      } 
    
+   h_nPV->Write();
+   h_nGoodPV->Write();
+   h_nTruePV->Write();
    
    TString outfile = "res/"+sample + "_" +cat+"_"+channel+".root";
    TFile fout(outfile, "recreate");
+
+   for(b=0; b<M; b++){
+       
+       h_pt[b]->Write();
+       h_pt_gluon[b]->Write();
+       h_pt_quark[b]->Write();
+       h_pt_undef[b]->Write();
+   }
    
    for(a=0; a<N; a++){
      for(b=0; b<M; b++){
@@ -423,6 +550,18 @@ int main(int argc, char **argv) {
        h_qgl_gluon[a][b]->Write();
        h_qgl_quark[a][b]->Write();
        h_qgl_undef[a][b]->Write();
+
+        
+       h_chg[a][b]->Write();
+       h_chg_gluon[a][b]->Write();
+       h_chg_quark[a][b]->Write();
+       h_chg_undef[a][b]->Write();
+
+        
+       h_neu[a][b]->Write();
+       h_neu_gluon[a][b]->Write();
+       h_neu_quark[a][b]->Write();
+       h_neu_undef[a][b]->Write();
 
        h_ptD_quark[a][b]->Write();
        h_minW_quark[a][b]->Write();
