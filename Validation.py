@@ -19,17 +19,30 @@ fileListDir = join(workdir,'files')
 lPath = "/mnt/t3nfs01/data01/shome/grauco/JetMET/CMSSW_7_6_3_patch2/src/ttDM/newTTDManalysis/"
 #path = "/scratch/grauco/B2G_25ns/"
 #path = "/scratch/decosa/07Oct2015/"
-t3Path = '//pnfs/psi.ch/cms/trivcat/store/user/grauco/JetMet_76X_v6/'
+t3Path = '//pnfs/psi.ch/cms/trivcat/store/user/grauco/JetMet_76X_v7/'
 #t3Path = '/store/user/grauco/B2G_Fw76X/'
 #t3Ls = 'xrdfs  xrootd-cms.infn.it ls -u'
 t3Ls = 'xrdfs t3dcachedb03.psi.ch ls -u'
 
 #define samples, one folder for each mass value
 samples = []
-samples.append("QCD_pythia")
+#samples.append("QCD_pythia")
 #samples.append("QCD_herwig")
-#samples.append("JetHT") 
-
+samples.append("ZeroBias") 
+samples.append("QCD_Pt50to80")
+samples.append("QCD_Pt85to120")
+samples.append("QCD_Pt600to800")
+samples.append("QCD_Pt800to1000")
+samples.append("QCD_Pt15to30")
+samples.append("QCD_Pt30to50")
+samples.append("QCD_Pt120to170")
+samples.append("QCD_Pt170to300")
+samples.append("QCD_Pt300to470")
+samples.append("QCD_Pt470to600")
+samples.append("QCD_Pt1000to1400")
+samples.append("QCD_Pt1400to1800")
+samples.append("QCD_Pt1800to2400")
+samples.append("QCD_Pt2400to3200")
 
 usage = 'usage: %prog -l lumi'
 parser = optparse.OptionParser(usage)
@@ -54,7 +67,7 @@ if not exists(fileListDir):
     os.makedirs(fileListDir)
 
 for s in samples:
-    if (s.startswith("DoubleMuon") or s.startswith("SingleMu") or  s.startswith("Jet")): isData="DATA"
+    if (s.startswith("Zero") or s.startswith("SingleMu") or  s.startswith("Jet")): isData="DATA"
     print s
     print str(opt.sync)
     #print cmd
