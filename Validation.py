@@ -1,3 +1,5 @@
+
+
 import os
 import optparse 
 import os.path
@@ -16,7 +18,8 @@ workdir = 'work'
 fileListDir = join(workdir,'files')
 
 #define samples paths
-lPath = "/mnt/t3nfs01/data01/shome/grauco/JetMET/CMSSW_7_6_3_patch2/src/ttDM/newTTDManalysis/"
+lPath="/mnt/t3nfs01/data01/shome/grauco/JetMET/CMSSW_7_6_3_patch2/src/QGLVal/QGLValAnalysis/"
+#lPath = "/mnt/t3nfs01/data01/shome/grauco/JetMET/CMSSW_7_6_3_patch2/src/ttDM/ne"
 #path = "/scratch/grauco/B2G_25ns/"
 #path = "/scratch/decosa/07Oct2015/"
 t3Path = '//pnfs/psi.ch/cms/trivcat/store/user/grauco/JetMet_76X_v7/'
@@ -28,7 +31,10 @@ t3Ls = 'xrdfs t3dcachedb03.psi.ch ls -u'
 samples = []
 #samples.append("QCD_pythia")
 #samples.append("QCD_herwig")
-samples.append("ZeroBias") 
+
+#samples.append("TEST")
+#samples.append("QCD")
+#samples.append("ZeroBias") 
 samples.append("QCD_Pt50to80")
 samples.append("QCD_Pt85to120")
 samples.append("QCD_Pt600to800")
@@ -53,8 +59,8 @@ parser.add_option('', '--sync', dest='sync', type='string', default = 'noSync', 
 parser.add_option('-d', '--isData', dest='isData', type='string', default = 'MC', help='is Data or MC?')
 parser.add_option('-g','--gdb', dest='gdb', action='store_true', default=False)
 parser.add_option('-n','--dryrun', dest='dryrun', action='store_true', default=False)
-parser.add_option('-m','--mode', dest='mode', default='t3se', choices=['local','t3se'])
-parser.add_option('--t3batch', dest='t3batch', action='store_true', default=True)
+parser.add_option('-m','--mode', dest='mode', default='local', choices=['local','t3se'])
+parser.add_option('--t3batch', dest='t3batch', action='store_true', default=False)
 
 isData="MC"
 (opt, args) = parser.parse_args()
@@ -67,7 +73,7 @@ if not exists(fileListDir):
     os.makedirs(fileListDir)
 
 for s in samples:
-    if (s.startswith("Zero") or s.startswith("SingleMu") or  s.startswith("Jet")): isData="DATA"
+    if (s.startswith("Zero") or s.startswith("ZeroBias") or  s.startswith("Jet")): isData="DATA"
     print s
     print str(opt.sync)
     #print cmd
@@ -98,7 +104,7 @@ for s in samples:
     with open(sampleFileList,'w') as sl:
         sl.write('\n'.join(files))
 
-    outDirs = ['res','trees']
+    outDirs = ['res_2','trees']
 
     for d in outDirs:
         if exists(d): continue
