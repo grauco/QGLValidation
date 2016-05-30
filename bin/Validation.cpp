@@ -21,15 +21,15 @@
 #include "THashList.h"
 #include <stdio.h>
 #include <string.h>
-#include "ttDM/TopTagResolved/interface/KinematicFitter.hh"
+#include "QGLVal/TopTagResolved/interface/KinematicFitter.hh"
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
-#include "QGLVal/QGLValAnalysis/interface/Weights.h"
-#include "QGLVal/QGLValAnalysis/interface/MT2Utility.h"
-#include "QGLVal/QGLValAnalysis/interface/mt2w_bisect.h"
-#include "QGLVal/QGLValAnalysis/interface/mt2bl_bisect.h"
-#include "QGLVal/QGLValAnalysis/interface/Mt2Com_bisect.h"
+#include "QGLVal/QGLValidation/interface/Weights.h"
+#include "QGLVal/QGLValidation/interface/MT2Utility.h"
+#include "QGLVal/QGLValidation/interface/mt2w_bisect.h"
+#include "QGLVal/QGLValidation/interface/mt2bl_bisect.h"
+#include "QGLVal/QGLValidation/interface/Mt2Com_bisect.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "QGLVal/localQGLikelihoodCalculator/localQGLikelihoodCalculator.h"
 #include "QGLVal/localQGLikelihoodCalculator/localQGLikelihoodCalculator.cc"
@@ -321,7 +321,7 @@ int main(int argc, char **argv) {
    //p=1;
    TH1F *h_cutFlow = new TH1F("h_cutFlow", "cutFlow", 5, -0.5, 4.5);
 
-   QGLikelihoodCalculator localQG("/mnt/t3nfs01/data01/shome/grauco/JetMET/CMSSW_7_6_3_patch2/src/QGLVal/QGLValAnalysis/pdfQG_AK4chs_13TeV_v2_PU20bx25_QCD_AllPtBins.root");
+   QGLikelihoodCalculator localQG("/mnt/t3nfs01/data01/shome/grauco/JetMET/CMSSW_7_6_3_patch2/src/QGLVal/QGLValidation/pdfQG_AK4chs_13TeV_v2_PU20bx25_QCD_AllPtBins.root");
 
    //if(nEvents>1000000) nEvents = 1000000;
    
