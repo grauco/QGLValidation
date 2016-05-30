@@ -21,15 +21,15 @@
 #include "THashList.h"
 #include <stdio.h>
 #include <string.h>
-#include "QGLVal/TopTagResolved/interface/KinematicFitter.hh"
+#include "ttDM/TopTagResolved/interface/KinematicFitter.hh"
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
-#include "QGLVal/QGLValidation/interface/Weights.h"
-#include "QGLVal/QGLValidation/interface/MT2Utility.h"
-#include "QGLVal/QGLValidation/interface/mt2w_bisect.h"
-#include "QGLVal/QGLValidation/interface/mt2bl_bisect.h"
-#include "QGLVal/QGLValidation/interface/Mt2Com_bisect.h"
+#include "QGLVal/QGLValAnalysis/interface/Weights.h"
+#include "QGLVal/QGLValAnalysis/interface/MT2Utility.h"
+#include "QGLVal/QGLValAnalysis/interface/mt2w_bisect.h"
+#include "QGLVal/QGLValAnalysis/interface/mt2bl_bisect.h"
+#include "QGLVal/QGLValAnalysis/interface/Mt2Com_bisect.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "QGLVal/localQGLikelihoodCalculator/localQGLikelihoodCalculator.h"
 #include "QGLVal/localQGLikelihoodCalculator/localQGLikelihoodCalculator.cc"
@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
   Int_t nEvents = (Int_t)chain.GetEntries();
   std::cout<<"Number of Events: "<<nEvents<< endl;
   //  if(nEvents>5000000) nEvents=5000000;
-  
+  nEvents=10000000;
                                                                               
   int sizeMax=50;
   Int_t jetSize, genPartSize, muonSize;
@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
   int n_trig(0), n_isBackToBack(0), n_radiation(0);
 
   float genpartpt[sizeMax], genparteta[sizeMax], genpartphi[sizeMax], genparte[sizeMax], genpartid[sizeMax], genpartstatus[sizeMax], genpartmomid[sizeMax], genpartmass[sizeMax];
-  float jete[sizeMax], jetpt[sizeMax], jetphi[sizeMax], jeteta[sizeMax], jetcsv[sizeMax], jetIsTight[sizeMax],jetmult[sizeMax], jetptd[sizeMax], jetaxis2[sizeMax], pileupJetIdptD[sizeMax],pileupJetIdnParticles[sizeMax],pileupJetIdminW[sizeMax], jetqgl[sizeMax],pileupJetIdRMS[sizeMax],pileupJetIdbeta[sizeMax], pileupJetIdbetaClassic[sizeMax], pileupJetIdbetaStar[sizeMax],pileupJetIdbetaStarClassic[sizeMax],pileupJetIddR2Mean[sizeMax],pileupJetIddRMean[sizeMax], pileupJetIddZ[sizeMax],pileupJetIdfrac01[sizeMax],pileupJetIdfrac02[sizeMax],pileupJetIdfrac03[sizeMax],pileupJetIdfrac04[sizeMax],pileupJetIdjetR[sizeMax],pileupJetIdjetRchg[sizeMax],pileupJetIdmajW[sizeMax],pileupJetIdnCharged[sizeMax],pileupJetIdnNeutrals[sizeMax],pileupJetIdpull[sizeMax] ;
+  float jetflavour[sizeMax], jete[sizeMax], jetpt[sizeMax], jetphi[sizeMax], jeteta[sizeMax], jetcsv[sizeMax], jetIsTight[sizeMax],jetmult[sizeMax], jetptd[sizeMax], jetaxis2[sizeMax], pileupJetIdptD[sizeMax],pileupJetIdnParticles[sizeMax],pileupJetIdminW[sizeMax], jetqgl[sizeMax],pileupJetIdRMS[sizeMax],pileupJetIdbeta[sizeMax], pileupJetIdbetaClassic[sizeMax], pileupJetIdbetaStar[sizeMax],pileupJetIdbetaStarClassic[sizeMax],pileupJetIddR2Mean[sizeMax],pileupJetIddRMean[sizeMax], pileupJetIddZ[sizeMax],pileupJetIdfrac01[sizeMax],pileupJetIdfrac02[sizeMax],pileupJetIdfrac03[sizeMax],pileupJetIdfrac04[sizeMax],pileupJetIdjetR[sizeMax],pileupJetIdjetRchg[sizeMax],pileupJetIdmajW[sizeMax],pileupJetIdnCharged[sizeMax],pileupJetIdnNeutrals[sizeMax],pileupJetIdpull[sizeMax] ;
    float muone[sizeMax], muonpt[sizeMax], muonphi[sizeMax], muoneta[sizeMax], muonIsTight[sizeMax], muoncharge[sizeMax];
    
    chain.SetBranchAddress("genpart_Pt", genpartpt);
@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
    chain.SetBranchAddress("genpart_Mom0ID", genpartmomid);
    chain.SetBranchAddress("genpart_size", &genPartSize);
 
-   //chain.SetBranchAddress("jetsAK4Tight_JetFlavour", jetflavour);
+   chain.SetBranchAddress("jetsAK4Tight_PartonFlavour", jetflavour);
    chain.SetBranchAddress("jetsAK4Tight_E", jete);
    chain.SetBranchAddress("jetsAK4Tight_Pt", jetpt);
    chain.SetBranchAddress("jetsAK4Tight_Phi", jetphi);
@@ -134,9 +134,6 @@ int main(int argc, char **argv) {
    chain.SetBranchAddress("jetsAK4Tight_ptD", jetptd);
    chain.SetBranchAddress("jetsAK4Tight_axis2", jetaxis2);
    chain.SetBranchAddress("jetsAK4Tight_size", &jetSize);
-   //   chain.SetBranchAddress("jetsAKTight_genJetPt", jetgenjetpt);
-   //chain.SetBranchAddress("jetsAKTight_genJetEta", jetgenjeteta);
-   //chain.SetBranchAddress("jetsAKTight_genJetEta", jetgenjetphi);
 
    chain.SetBranchAddress("jetsAK4Tight_pileupJetIdptD", pileupJetIdptD);
    chain.SetBranchAddress("jetsAK4Tight_pileupJetIdnParticles",pileupJetIdnParticles);
@@ -185,6 +182,7 @@ int main(int argc, char **argv) {
    TH1F *h_nPV = new TH1F("h_nPV","nPV", 30, 0,30);
    TH1F *h_nTruePV = new TH1F("h_nTruePV","nTruePV", 30, 0,30);
    TH1F *h_nGoodPV = new TH1F("h_nGoodPV","nGoodPV", 30, 0,30);
+   TH1F *h_deltaR = new TH1F("h_deltaR", "deltaR", 40, 0, 2);
    
    int a,b;
    int N = 10, M=5;
@@ -321,9 +319,9 @@ int main(int argc, char **argv) {
    //p=1;
    TH1F *h_cutFlow = new TH1F("h_cutFlow", "cutFlow", 5, -0.5, 4.5);
 
-   QGLikelihoodCalculator localQG("/mnt/t3nfs01/data01/shome/grauco/JetMET/CMSSW_7_6_3_patch2/src/QGLVal/QGLValidation/pdfQG_AK4chs_13TeV_v2_PU20bx25_QCD_AllPtBins.root");
+   QGLikelihoodCalculator localQG("/mnt/t3nfs01/data01/shome/grauco/JetMET/CMSSW_7_6_3_patch2/src/QGLVal/QGLValAnalysis/pdfQG_AK4chs_13TeV_v2_PU20bx25_QCD_AllPtBins.root");
 
-   //if(nEvents>1000000) nEvents = 1000000;
+   //   if(nEvents>500000) nEvents = 500000;
    
    for(Int_t i=0; i<nEvents; i++ )
      {
@@ -332,7 +330,7 @@ int main(int argc, char **argv) {
 	 cout<<"Running on event: "<<i<<endl;
        }
        chain.GetEntry(i);
-
+       
        float ptRatiobins[10]={30,40,50,60,80,100,120,250,500,800};
        float etaRatiobins[5]={0.0,2.0,2.5,3.0,4.7};
 
@@ -346,6 +344,7 @@ int main(int argc, char **argv) {
 	 float chg;
 	 float neu;
 	 float pt;
+	 int jetflavour;
        };
        std::vector<TightJets> SelectedJets;
     
@@ -371,8 +370,9 @@ int main(int argc, char **argv) {
 	     b.ptD=jetptd[0];
 	     b.nPart = jetmult[0];
 	     b.chg = pileupJetIdnCharged[0] ;
-	     b.neu = pileupJetIdnNeutrals[1];
+	     b.neu = pileupJetIdnNeutrals[0];
 	     b.pt = jet0.Pt();
+	     b.jetflavour=jetflavour[0];
 	     SelectedJets.push_back(b);
 
 	     TightJets b2;
@@ -385,6 +385,7 @@ int main(int argc, char **argv) {
 	     b2.chg = pileupJetIdnCharged[1];
 	     b2.neu = pileupJetIdnNeutrals[1];
 	     b2.pt = jet1.Pt();
+	     b2.jetflavour = jetflavour[1];
 	     SelectedJets.push_back(b2);
 	   }
 	     
@@ -393,12 +394,11 @@ int main(int argc, char **argv) {
 	     if(areBackToBack){
 	       n_isBackToBack+=w;
 	       if(SelectedJets.size()>1){
-
-
+		 
 		 h_nPV->Fill(nPV,p);
 		 h_nGoodPV->Fill(nGoodPV,p);
 		 h_nTruePV->Fill(nTruePV,p);
-
+		 
 		 for(int j=0;j<4;j++){
 		   if(abs((SelectedJets[0].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[0].vect).Eta())<etaRatiobins[j+1]){
 		     h_pt[j]->Fill(SelectedJets[0].pt,p);
@@ -407,6 +407,7 @@ int main(int argc, char **argv) {
 		     h_pt[j]->Fill(SelectedJets[1].pt,p);
                    }
 		 }
+		 
 		 for(int i=0;i<9;i++){
 		   for(int j=0;j<4;j++){	       
 		     if(abs((SelectedJets[0].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[0].vect).Eta())<etaRatiobins[j+1] && ((SelectedJets[1].vect).Pt())>ptRatiobins[i] &&  ((SelectedJets[1].vect).Pt())<ptRatiobins[i+1]){	 
@@ -416,7 +417,7 @@ int main(int argc, char **argv) {
 		       h_qgl[i][j]->Fill(SelectedJets[0].qgl,p);
 		       h_chg[i][j]->Fill(SelectedJets[0].chg,p);
 		       h_neu[i][j]->Fill(SelectedJets[0].neu,p);
-			 
+		       
 		     }
 		     if(abs((SelectedJets[1].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[1].vect).Eta())<etaRatiobins[j+1] && ((SelectedJets[0].vect).Pt())>ptRatiobins[i] &&  ((SelectedJets[0].vect).Pt())<ptRatiobins[i+1]){
 		       h_ptD[i][j]->Fill(SelectedJets[1].ptD,p);
@@ -432,34 +433,52 @@ int main(int argc, char **argv) {
 		 float deltaR_jetallpartons[2];
 		 float mindeltaR_jetallpartons[2];
 		 int genindex[2];
+		 float maxpt[2];
+		 //		 int maxindex[2];
+		 
+		 
+		 
+		 //int index[2];
 		 for(int n=0; n<2; n++){
 		   deltaR_jetallpartons[n]= -999;
 		   mindeltaR_jetallpartons[n]= 999;
 		   genindex[n]=999;
+		   maxpt[n]=-999;
+		   //		   maxindex[n]=999;
+		   //index[n]=999;
 		   for(int i=0; i<genPartSize; i++){	   
 		     if(genpartpt[i]>0.1){
-		       //if(genpartstatus[i]==11){
-		       if(genpartstatus[i]<=23.1 && genpartstatus[i]>=22.9){
-		       TLorentzVector genParticle;
+		       if( (genpartid[i]<=5 && genpartid[i]>=-5) || (genpartid[i]<=21.2 && genpartid[i]>=20.9)){
+			 if(deltaR((SelectedJets[n].vect).Eta(),(SelectedJets[n].vect).Phi(),genparteta[i],genpartphi[i])<0.4){
+			   if(genpartpt[i]>maxpt[n]){
+			     maxpt[n]=genpartpt[i];
+			     //			     maxindex[n]=i;
+			   }
+			 }
+		       }		       
+		       if((genpartstatus[i]<=23.1 && genpartstatus[i]>=22.9)){
+			 TLorentzVector genParticle;
 			 genParticle.SetPtEtaPhiE(genpartpt[i], genparteta[i], genpartphi[i], genparte[i]);
 			 deltaR_jetallpartons[n]=deltaR((SelectedJets[n].vect).Eta(),(SelectedJets[n].vect).Phi(),genparteta[i],genpartphi[i]);
 			 if(deltaR_jetallpartons[n] < mindeltaR_jetallpartons[n]){                 
 			   genindex[n]=genpartid[i];
 			   mindeltaR_jetallpartons[n] = deltaR_jetallpartons[n];
-			 }     
+			   //index[n]=i;  
+			 }
 		       }
 		     }
 		   }
+		   //		   if(genpartid[maxindex[n]]>20.9) cout << "ieooo" << endl;
 		 }
-
-
+		 h_deltaR->Fill(mindeltaR_jetallpartons[0],p);
+		 h_deltaR->Fill(mindeltaR_jetallpartons[1],p);
+		 
 		 for(int j=0;j<4;j++){
 		   if(abs((SelectedJets[0].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[0].vect).Eta())<etaRatiobins[j+1]){
-		     if(mindeltaR_jetallpartons[0]<0.3){
+		     if(mindeltaR_jetallpartons[0]<0.8){
 		       if((genindex[0]<=5 && genindex[0]>=-5)){
 			 h_pt_quark[j]->Fill(SelectedJets[0].pt,p);
 		       }
-		       
 		       else if(genindex[0]<=21.1 && genindex[0]>=20.9){
 			 h_pt_gluon[j]->Fill(SelectedJets[0].pt,p);
 		       }
@@ -469,13 +488,13 @@ int main(int argc, char **argv) {
 		     }
 		   }
 		   if(abs((SelectedJets[1].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[1].vect).Eta())<etaRatiobins[j+1]){
-		     if(mindeltaR_jetallpartons[1]<0.3){
+		     if(mindeltaR_jetallpartons[1]<0.8){
 		       if((genindex[1]<=5 && genindex[1]>=-5)){
 			 h_pt_quark[j]->Fill(SelectedJets[1].pt,p);
 		       }
-			 else if(genindex[1]<=21.1 && genindex[1]>=20.9){
-			   h_pt_gluon[j]->Fill(SelectedJets[1].pt,p);
-			 }
+		       else if(genindex[1]<=21.1 && genindex[1]>=20.9){
+			 h_pt_gluon[j]->Fill(SelectedJets[1].pt,p);
+		       }
 		     }
 		     else{
 		       h_pt_undef[j]->Fill(SelectedJets[1].pt,p);
@@ -487,9 +506,11 @@ int main(int argc, char **argv) {
 		 for(int i=0;i<9;i++){
 		   for(int j=0;j<5;j++){
 		     if(abs((SelectedJets[0].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[0].vect).Eta())<etaRatiobins[j+1] && ((SelectedJets[1].vect).Pt())>ptRatiobins[i] &&  ((SelectedJets[1].vect).Pt())<ptRatiobins[i+1]){
-
-		       if(mindeltaR_jetallpartons[0]<0.3){
-		       	 if((genindex[0]<=5 && genindex[0]>=-5)){
+		       //if((genpartpt[index[0]]/(SelectedJets[0].vect).Pt())<2 && ((genpartpt[index[0]]/(SelectedJets[0].vect).Pt()) > 0.5)){
+		       if(mindeltaR_jetallpartons[0]<0.4){
+			 // if((( SelectedJets[0].jetflavour<=5 && SelectedJets[0].jetflavour>=-5 && SelectedJets[0].jetflavour!=0))){ 
+			 if(((genindex[0]<=5 && genindex[0]>=-5))){
+			 //if (genpartid[maxindex[0]]<=5 && genpartid[maxindex[0]]>=-5){
 			   h_ptD_quark[i][j]->Fill(SelectedJets[0].ptD,p);
 			   h_nPart_quark[i][j]->Fill(SelectedJets[0].nPart,p);
 			   h_minW_quark[i][j]->Fill(-log(SelectedJets[0].minW),p);                                   
@@ -499,6 +520,8 @@ int main(int argc, char **argv) {
 			 }
 			 
 			 else if(genindex[0]<=21.1 && genindex[0]>=20.9){
+			   //else if (genpartid[maxindex[0]]<=21.1 && genpartid[maxindex[0]]>=20.9){
+			 //else if((SelectedJets[0].jetflavour<=21.1 && SelectedJets[0].jetflavour>=20.9)){
 			   h_ptD_gluon[i][j]->Fill(SelectedJets[0].ptD,p);
 			   h_nPart_gluon[i][j]->Fill(SelectedJets[0].nPart,p);
 			   h_minW_gluon[i][j]->Fill(-log(SelectedJets[0].minW),p);
@@ -506,22 +529,62 @@ int main(int argc, char **argv) {
 			   h_chg_gluon[i][j]->Fill(SelectedJets[0].chg,p);
 			   h_neu_gluon[i][j]->Fill(SelectedJets[0].neu,p); 
 			 }
+			 else{
+			   h_ptD_undef[i][j]->Fill(SelectedJets[0].ptD,p);
+			   h_nPart_undef[i][j]->Fill(SelectedJets[0].nPart,p);
+			   h_minW_undef[i][j]->Fill(-log(SelectedJets[0].minW),p);
+			   h_qgl_undef[i][j]->Fill(SelectedJets[0].qgl,p);
+			   h_chg_undef[i][j]->Fill(SelectedJets[0].chg,p);
+			   h_neu_undef[i][j]->Fill(SelectedJets[0].neu,p);
+			   }
 		       }
 		       else{
+			 /*if((SelectedJets[0].jetflavour<=5 && SelectedJets[0].jetflavour>=-5 && SelectedJets[0].jetflavour!=0)){
+			   h_ptD_quark[i][j]->Fill(SelectedJets[0].ptD,p);
+			   h_nPart_quark[i][j]->Fill(SelectedJets[0].nPart,p);
+			   h_minW_quark[i][j]->Fill(-log(SelectedJets[0].minW),p);
+			   h_qgl_quark[i][j]->Fill(SelectedJets[0].qgl,p);
+			   h_chg_quark[i][j]->Fill(SelectedJets[0].chg,p);
+			   h_neu_quark[i][j]->Fill(SelectedJets[0].neu,p);
+
+			 }
+
+			 else if((SelectedJets[0].jetflavour<=21.1 && SelectedJets[0].jetflavour>=20.9)){
+			   h_ptD_gluon[i][j]->Fill(SelectedJets[0].ptD,p);
+			   h_nPart_gluon[i][j]->Fill(SelectedJets[0].nPart,p);
+			   h_minW_gluon[i][j]->Fill(-log(SelectedJets[0].minW),p);
+			   h_qgl_gluon[i][j]->Fill(SelectedJets[0].qgl,p);
+			   h_chg_gluon[i][j]->Fill(SelectedJets[0].chg,p);
+			   h_neu_gluon[i][j]->Fill(SelectedJets[0].neu,p);
+
+			 }
+			 
+			 else if(SelectedJets[0].jetflavour==0){
+			   h_ptD_undef[i][j]->Fill(SelectedJets[0].ptD,p);
+			   h_nPart_undef[i][j]->Fill(SelectedJets[0].nPart,p);
+			   h_minW_undef[i][j]->Fill(-log(SelectedJets[0].minW),p);
+			   h_qgl_undef[i][j]->Fill(SelectedJets[0].qgl,p);
+			   h_chg_undef[i][j]->Fill(SelectedJets[0].chg,p);
+			   h_neu_undef[i][j]->Fill(SelectedJets[0].neu,p); 
+			   }
+			 */
 			 h_ptD_undef[i][j]->Fill(SelectedJets[0].ptD,p);
 			 h_nPart_undef[i][j]->Fill(SelectedJets[0].nPart,p);
 			 h_minW_undef[i][j]->Fill(-log(SelectedJets[0].minW),p);
 			 h_qgl_undef[i][j]->Fill(SelectedJets[0].qgl,p);
 			 h_chg_undef[i][j]->Fill(SelectedJets[0].chg,p);
-			 h_neu_undef[i][j]->Fill(SelectedJets[0].neu,p); 
-		       }
-		       
+			 h_neu_undef[i][j]->Fill(SelectedJets[0].neu,p);
+			 
+		        }
+		       // }
+		       // }
 		     }
-		   
 		     if(abs((SelectedJets[1].vect).Eta())>etaRatiobins[j] && abs((SelectedJets[1].vect).Eta())<etaRatiobins[j+1] && ((SelectedJets[0].vect).Pt())>ptRatiobins[i] &&  ((SelectedJets[0].vect).Pt())<ptRatiobins[i+1]){                                             
-		       
-		       if(mindeltaR_jetallpartons[1]<0.3){                                                            
-			 if((genindex[1]<=5 && genindex[1]>=-5)){ 
+		       //if((genpartpt[index[1]]/(SelectedJets[1].vect).Pt())<2 && ((genpartpt[index[1]]/(SelectedJets[1].vect).Pt()) > 0.5)){ 
+		       if(mindeltaR_jetallpartons[1]<0.4){
+			 if((genindex[1]<=5 && genindex[1]>=-5)){
+		       //if((SelectedJets[1].jetflavour<=5 && SelectedJets[1].jetflavour>=-5 && SelectedJets[1].jetflavour!=0)){ 
+			   //if (genpartid[maxindex[1]]<=5 && genpartid[maxindex[1]]>=-5){
 			   h_ptD_quark[i][j]->Fill(SelectedJets[1].ptD,p);
 			   h_nPart_quark[i][j]->Fill(SelectedJets[1].nPart,p);
 			   h_minW_quark[i][j]->Fill(-log(SelectedJets[1].minW),p);                                     
@@ -529,7 +592,9 @@ int main(int argc, char **argv) {
 			   h_chg_quark[i][j]->Fill(SelectedJets[1].chg,p);
 			   h_neu_quark[i][j]->Fill(SelectedJets[1].neu,p);
 			 }
-			 else if(genindex[1]<=21.1 && genindex[1]>=20.9){
+			 // else if((SelectedJets[1].jetflavour<=21.1 && SelectedJets[1].jetflavour>=20.9)){ 
+		       else if((genindex[1]<=21.1 && genindex[1]>=20.9)){
+			   //else if (genpartid[maxindex[1]]<=21.1 && genpartid[maxindex[1]]>=20.9){
 			   h_ptD_gluon[i][j]->Fill(SelectedJets[1].ptD,p);
 			   h_nPart_gluon[i][j]->Fill(SelectedJets[1].nPart,p);
 			   h_minW_gluon[i][j]->Fill(-log(SelectedJets[1].minW),p);
@@ -537,37 +602,77 @@ int main(int argc, char **argv) {
 			   h_chg_gluon[i][j]->Fill(SelectedJets[1].chg,p);
 			   h_neu_gluon[i][j]->Fill(SelectedJets[1].neu,p);
 			 }
+			 
 			 else{
 			   h_ptD_undef[i][j]->Fill(SelectedJets[1].ptD,p);
 			   h_nPart_undef[i][j]->Fill(SelectedJets[1].nPart,p);
 			   h_minW_undef[i][j]->Fill(-log(SelectedJets[1].minW),p);
 			   h_qgl_undef[i][j]->Fill(SelectedJets[1].qgl,p);
 			   h_chg_undef[i][j]->Fill(SelectedJets[1].chg,p);
-			   h_neu_undef[i][j]->Fill(SelectedJets[1].neu,p);  
+			   h_neu_undef[i][j]->Fill(SelectedJets[1].neu,p);
+			   }
+		       }
+		       else{
+			 
+			 /*		 if((SelectedJets[1].jetflavour<=5 && SelectedJets[1].jetflavour>=-5 && SelectedJets[1].jetflavour!=0)){
+			   
+			   h_ptD_quark[i][j]->Fill(SelectedJets[1].ptD,p);
+			   h_nPart_quark[i][j]->Fill(SelectedJets[1].nPart,p);
+			   h_minW_quark[i][j]->Fill(-log(SelectedJets[1].minW),p);
+			   h_qgl_quark[i][j]->Fill(SelectedJets[1].qgl,p);
+			   h_chg_quark[i][j]->Fill(SelectedJets[1].chg,p);
+			   h_neu_quark[i][j]->Fill(SelectedJets[1].neu,p);
 			 }
-		       }			
-		     }
+
+			 else if((SelectedJets[1].jetflavour<=21.1 && SelectedJets[1].jetflavour>=20.9)){
+			   
+			   h_ptD_gluon[i][j]->Fill(SelectedJets[1].ptD,p);
+			   h_nPart_gluon[i][j]->Fill(SelectedJets[1].nPart,p);
+			   h_minW_gluon[i][j]->Fill(-log(SelectedJets[1].minW),p);
+			   h_qgl_gluon[i][j]->Fill(SelectedJets[1].qgl,p);
+			   h_chg_gluon[i][j]->Fill(SelectedJets[1].chg,p);
+			   h_neu_gluon[i][j]->Fill(SelectedJets[1].neu,p);
+			 }
+
+			 else if((SelectedJets[1].jetflavour==0)){
+			   
+			   h_ptD_undef[i][j]->Fill(SelectedJets[1].ptD,p);
+			   h_nPart_undef[i][j]->Fill(SelectedJets[1].nPart,p);
+			   h_minW_undef[i][j]->Fill(-log(SelectedJets[1].minW),p);
+			   h_qgl_undef[i][j]->Fill(SelectedJets[1].qgl,p);
+			   h_chg_undef[i][j]->Fill(SelectedJets[1].chg,p);
+			   h_neu_undef[i][j]->Fill(SelectedJets[1].neu,p);
+			   }
+			 */
+			h_ptD_undef[i][j]->Fill(SelectedJets[1].ptD,p);
+			 h_nPart_undef[i][j]->Fill(SelectedJets[1].nPart,p);
+			 h_minW_undef[i][j]->Fill(-log(SelectedJets[1].minW),p);
+			 h_qgl_undef[i][j]->Fill(SelectedJets[1].qgl,p);
+			 h_chg_undef[i][j]->Fill(SelectedJets[1].chg,p);
+			 h_neu_undef[i][j]->Fill(SelectedJets[1].neu,p); 
+			 
+			 
+			 // }
+		     	 }
+			 }		
 		   }
-		 }	 
-	       }
+		   }
+	       }	 
 	     }
 	   }
 	 }
        }
      }
-   //   h_nPV->Write();
-   // h_nGoodPV->Write();
-   //h_nTruePV->Write();
    
    TString outfile = "res/"+sample + "_" +cat+"_"+channel+".root";
    TFile fout(outfile, "recreate");
-
+   
    for(b=0; b<M; b++){
-       
-       h_pt[b]->Write();
-       h_pt_gluon[b]->Write();
-       h_pt_quark[b]->Write();
-       h_pt_undef[b]->Write();
+     
+     h_pt[b]->Write();
+     h_pt_gluon[b]->Write();
+     h_pt_quark[b]->Write();
+     h_pt_undef[b]->Write();
    }
    
    for(a=0; a<N; a++){
@@ -622,6 +727,7 @@ int main(int argc, char **argv) {
    h_nPV->Write();
    h_nGoodPV->Write();
    h_nTruePV->Write();
+   h_deltaR->Write();
 
    fout.Close();
    fileout.close();
