@@ -21,15 +21,15 @@
 #include "THashList.h"
 #include <stdio.h>
 #include <string.h>
-#include "ttDM/TopTagResolved/interface/KinematicFitter.hh"
+#include "QGLVal/TopTagResolved/interface/KinematicFitter.hh"
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
-#include "QGLVal/QGLValAnalysis/interface/Weights.h"
-#include "QGLVal/QGLValAnalysis/interface/MT2Utility.h"
-#include "QGLVal/QGLValAnalysis/interface/mt2w_bisect.h"
-#include "QGLVal/QGLValAnalysis/interface/mt2bl_bisect.h"
-#include "QGLVal/QGLValAnalysis/interface/Mt2Com_bisect.h"
+#include "QGLVal/QGLValidation/interface/Weights.h"
+#include "QGLVal/QGLValidation/interface/MT2Utility.h"
+#include "QGLVal/QGLValidation/interface/mt2w_bisect.h"
+#include "QGLVal/QGLValidation/interface/mt2bl_bisect.h"
+#include "QGLVal/QGLValidation/interface/Mt2Com_bisect.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "QGLVal/localQGLikelihoodCalculator/localQGLikelihoodCalculator.h"
 #include "QGLVal/localQGLikelihoodCalculator/localQGLikelihoodCalculator.cc"
@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
   Int_t nEvents = (Int_t)chain.GetEntries();
   std::cout<<"Number of Events: "<<nEvents<< endl;
   //  if(nEvents>5000000) nEvents=5000000;
-  nEvents=10000000;
+  //  nEvents=10000000;
                                                                               
   int sizeMax=50;
   Int_t jetSize, genPartSize, muonSize;
@@ -314,14 +314,17 @@ int main(int argc, char **argv) {
    else if(strcmp (sample.c_str(),"QCD_Pt1400to1800") == 0) p=(float)(x * (float)(2.6 * 0.84265  * 1000));
    else if(strcmp (sample.c_str(),"QCD_Pt1800to2400") == 0) p=(float)(x * (float)(2.6 * 0.114943  * 1000));
    else if(strcmp (sample.c_str(),"QCD_Pt2400to3200") == 0) p=(float)(x * (float)(2.6 * 0.00682981  * 1000)); 
- 
+   else if(strcmp (sample.c_str(),"QCD_HT100to200") == 0) p=(float)(x * (float)(2.6 * 27850000 * 1000));
+   else if(strcmp (sample.c_str(),"QCD_HT200to300") == 0) p=(float)(x * (float)(2.6 * 1717000  * 1000));
+   else if(strcmp (sample.c_str(),"QCD_HT300to500") == 0) p=(float)(x * (float)(2.6 * 351300  * 1000));
+   else if(strcmp (sample.c_str(),"QCD_HT500to700") == 0) p=(float)(x * (float)(2.6 * 31630  * 1000));
+   else if(strcmp (sample.c_str(),"QCD_HT200to300_ext") == 0) p=(float)(x * (float)(2.6 * 1717000  * 1000));
+   else if(strcmp (sample.c_str(),"QCD_HT300to500_ext") == 0) p=(float)(x * (float)(2.6 * 351300  * 1000));
    cout << "weight is" << p << endl;
    //p=1;
    TH1F *h_cutFlow = new TH1F("h_cutFlow", "cutFlow", 5, -0.5, 4.5);
 
-   QGLikelihoodCalculator localQG("/mnt/t3nfs01/data01/shome/grauco/JetMET/CMSSW_7_6_3_patch2/src/QGLVal/QGLValAnalysis/pdfQG_AK4chs_13TeV_v2_PU20bx25_QCD_AllPtBins.root");
-
-   //   if(nEvents>500000) nEvents = 500000;
+   QGLikelihoodCalculator localQG("/mnt/t3nfs01/data01/shome/grauco/JetMET/CMSSW_7_6_3_patch2/src/QGLVal/QGLValidation/pdfQG_AK4chs_13TeV_v2_PU20bx25_QCD_AllPtBins.root");
    
    for(Int_t i=0; i<nEvents; i++ )
      {
@@ -664,7 +667,7 @@ int main(int argc, char **argv) {
        }
      }
    
-   TString outfile = "res/"+sample + "_" +cat+"_"+channel+".root";
+   TString outfile = "res/"+sample + "_" +cat+"_"+channel+"status23cone04.root";
    TFile fout(outfile, "recreate");
    
    for(b=0; b<M; b++){
